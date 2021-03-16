@@ -1,0 +1,95 @@
+---
+title: "IGT_Modeling"
+author: "Eliany Perez"
+date: "3/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd ("G:/My Drive/EP_Year1/IGT analysis/Rmodeling")
+
+
+#to change settings for r to run go to https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
+library(devtools)
+library(hBayesDM)
+library(rstan)
+```
+
+```{r}
+output<-igt_pvl_delta(data = "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/igt_data2.txt", niter = 4000, nwarmup = 1000,
+              nchain = 4, ncore = 1, nthin = 1, inits = "vb",
+              indPars = "mean", modelRegressor = FALSE, vb = FALSE,
+              inc_postpred = FALSE, adapt_delta = 0.95, stepsize = 1,
+              max_treedepth = 10)
+
+```
+
+```{r}
+# Visually check convergence of the sampling chains (should look like 'hairy caterpillars')
+plot(output, type = "trace")
+
+# Check Rhat values (all Rhat values should be less than or equal to 1.1)
+rhat(output)
+
+# Plot the posterior distributions of the hyper-parameters (distributions should be unimodal)
+plot(output)
+
+# Show the WAIC and LOOIC model fit estimates
+printFit(output)
+```
+
+
+```{r}
+output2<-igt_orl(data = "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/igt_data2.txt", niter = 4000, nwarmup = 1000, nchain = 4,
+  ncore = 1, nthin = 1, inits = "vb", indPars = "mean",
+  modelRegressor = FALSE, vb = FALSE, inc_postpred = FALSE,
+  adapt_delta = 0.95, stepsize = 1, max_treedepth = 10)
+```
+
+```{r}
+# Visually check convergence of the sampling chains (should look like 'hairy caterpillars')
+plot(output2, type = "trace")
+
+# Check Rhat values (all Rhat values should be less than or equal to 1.1)
+rhat(output2)
+
+# Plot the posterior distributions of the hyper-parameters (distributions should be unimodal)
+plot(output2)
+
+# Show the WAIC and LOOIC model fit estimates
+printFit(output2)
+```
+
+
+```{r}
+  setwd("G:/My Drive/EP_Year1/IGT analysis/Rmodeling")
+  allindpars<-as.data.frame(output3$allIndPars)
+  write.csv(allindpars, "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/allindpars.csv", row.names=FALSE)
+
+  allindpars<-read.csv("G:/My Drive/EP_Year1/IGT analysis/Rmodeling/allindpars.csv")
+  Etotal<-read.csv( "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/Etotal.csv")
+  merged<-merge(allindpars,Etotal,by.x="ID")
+```
+
+```{r}
+    library(ggplot2)
+  library(ggpubr)
+  theme_set(
+    theme_minimal() +
+      theme(legend.position = "top")
+  )
+  b <- ggplot(merged, aes(x = E_choice, y = cons))
+  # Scatter plot with regression line
+  b + geom_point()+
+    geom_smooth(method = "lm") 
+```
+
+```{r}
+cor.test(merged$E_choice, merged$cons, method=c("pearson", "kendall", "spearman"))
+
+```
+
