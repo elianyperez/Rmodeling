@@ -2,7 +2,7 @@
 title: "IGT_Modeling"
 author: "Eliany Perez"
 date: "3/10/2021"
-output: html_document
+pvl: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -19,8 +19,10 @@ library(hBayesDM)
 library(rstan)
 ```
 
+Run PVL model
+
 ```{r}
-output<-igt_pvl_delta(data = "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/igt_data2.txt", niter = 4000, nwarmup = 1000,
+pvl<-igt_pvl_delta(data = "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/igt_data2.txt", niter = 4000, nwarmup = 1000,
               nchain = 4, ncore = 1, nthin = 1, inits = "vb",
               indPars = "mean", modelRegressor = FALSE, vb = FALSE,
               inc_postpred = FALSE, adapt_delta = 0.95, stepsize = 1,
@@ -30,21 +32,22 @@ output<-igt_pvl_delta(data = "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/igt_da
 
 ```{r}
 # Visually check convergence of the sampling chains (should look like 'hairy caterpillars')
-plot(output, type = "trace")
+plot(pvl, type = "trace")
 
 # Check Rhat values (all Rhat values should be less than or equal to 1.1)
-rhat(output)
+rhat(pvl)
 
 # Plot the posterior distributions of the hyper-parameters (distributions should be unimodal)
-plot(output)
+plot(pvl)
 
 # Show the WAIC and LOOIC model fit estimates
-printFit(output)
+printFit(pvl)
 ```
 
+Run orl model
 
 ```{r}
-output2<-igt_orl(data = "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/igt_data2.txt", niter = 4000, nwarmup = 1000, nchain = 4,
+orl<-igt_orl(data = "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/igt_data2.txt", niter = 4000, nwarmup = 1000, nchain = 4,
   ncore = 1, nthin = 1, inits = "vb", indPars = "mean",
   modelRegressor = FALSE, vb = FALSE, inc_postpred = FALSE,
   adapt_delta = 0.95, stepsize = 1, max_treedepth = 10)
@@ -52,22 +55,46 @@ output2<-igt_orl(data = "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/igt_data2.t
 
 ```{r}
 # Visually check convergence of the sampling chains (should look like 'hairy caterpillars')
-plot(output2, type = "trace")
+plot(orl, type = "trace")
 
 # Check Rhat values (all Rhat values should be less than or equal to 1.1)
-rhat(output2)
+rhat(orl)
 
 # Plot the posterior distributions of the hyper-parameters (distributions should be unimodal)
-plot(output2)
+plot(orl)
 
 # Show the WAIC and LOOIC model fit estimates
-printFit(output2)
+printFit(orl)
 ```
 
+Run vpp model
+
+```{r}
+vpp<-igt_vpp(data = "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/igt_data2.txt", niter = 4000, nwarmup = 1000, nchain = 4,
+  ncore = 4, nthin = 1, inits = "vb", indPars = "mean",
+  modelRegressor = FALSE, vb = FALSE, inc_postpred = FALSE,
+  adapt_delta = 0.95, stepsize = 1, max_treedepth = 10)
+```
+
+```{r}
+# Visually check convergence of the sampling chains (should look like 'hairy caterpillars')
+plot(vpp, type = "trace")
+
+# Check Rhat values (all Rhat values should be less than or equal to 1.1)
+rhat(vpp)
+
+# Plot the posterior distributions of the hyper-parameters (distributions should be unimodal)
+plot(vpp)
+
+# Show the WAIC and LOOIC model fit estimates
+printFit(vpp)
+```
+
+Correlations between mode parameters and raw E choice
 
 ```{r}
   setwd("G:/My Drive/EP_Year1/IGT analysis/Rmodeling")
-  allindpars<-as.data.frame(output3$allIndPars)
+  allindpars<-as.data.frame(pvl3$allIndPars)
   write.csv(allindpars, "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/allindpars.csv", row.names=FALSE)
 
   allindpars<-read.csv("G:/My Drive/EP_Year1/IGT analysis/Rmodeling/allindpars.csv")
