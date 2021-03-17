@@ -10,13 +10,16 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-setwd ("G:/My Drive/EP_Year1/IGT analysis/Rmodeling")
+setwd ("C:/Users/elianyperez/Desktop/Rmodeling")
 
 
 #to change settings for r to run go to https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started
 library(devtools)
 library(hBayesDM)
 library(rstan)
+library(ggplot2)
+library(ggpubr)
+library(ggcorrplot)
 ```
 
 Run PVL model
@@ -88,16 +91,19 @@ plot(vpp)
 
 # Show the WAIC and LOOIC model fit estimates
 printFit(vpp)
+
+save.image(vpp.RData)
 ```
 
 Correlations between mode parameters and raw E choice
 
 ```{r}
-  setwd("G:/My Drive/EP_Year1/IGT analysis/Rmodeling")
+  load(vpp.RData)
+  setwd("C:/Users/elianyperez/Desktop/Rmodeling")
   pvlPars<-as.data.frame(pvl$allIndPars)
   orlPars<-as.data.frame(orl$allIndPars)
   vppPars<-as.data.frame(vpp$allIndPars)
-  Echoice<- read.csv("G:/My Drive/EP_Year1/IGT analysis/Rmodeling/Etotal.csv")
+  Echoice<- read.csv("C:/Users/elianyperez/Desktop/Rmodeling/Etotal.csv")
   
   names(pvlPars)<-c("ID","pvl_A","pvl_alpha","pvl_cons","pvl_lambda")
   names(orlPars)<-c("ID","orl_Arew","orl_Apun","orl_K","orl_betaF","orl_betaP" )
@@ -111,38 +117,206 @@ Correlations between mode parameters and raw E choice
 names(mergedPars)
   
   #choose columns
-  mergedPars<- mergedPars[c("ID","pvl_A","pvl_alpha","pvl_cons","pvl_lambda","orl_Arew","orl_Apun","orl_K","orl_betaF","orl_betaP","vpp_A","vpp_alpha","vpp_cons","vpp_lambda","vpp_epP","vpp_epN","vpp_K","vpp_w","E_choice")] 
-  pvlPars<-mergedPars[c("ID","pvl_A","pvl_alpha","pvl_cons","pvl_lambda","E_choice")] 
-  orlPars<-mergedPars[c("ID","orl_Arew","orl_Apun","orl_K","orl_betaF","orl_betaP","E_choice")]
-  vppPars<-mergedPars[c("ID","vpp_A","vpp_alpha","vpp_cons","vpp_lambda","vpp_epP","vpp_epN","vpp_K","vpp_w","E_choice")] 
+  mergedPars<- mergedPars[c("pvl_A","pvl_alpha","pvl_cons","pvl_lambda","orl_Arew","orl_Apun","orl_K","orl_betaF","orl_betaP","vpp_A","vpp_alpha","vpp_cons","vpp_lambda","vpp_epP","vpp_epN","vpp_K","vpp_w","E_choice")] 
+  
+  pvlPars<-mergedPars[c("pvl_A","pvl_alpha","pvl_cons","pvl_lambda","E_choice")] 
+  orlPars<-mergedPars[c("orl_Arew","orl_Apun","orl_K","orl_betaF","orl_betaP","E_choice")]
+  vppPars<-mergedPars[c("vpp_A","vpp_alpha","vpp_cons","vpp_lambda","vpp_epP","vpp_epN","vpp_K","vpp_w","E_choice")] 
   
   #if you want to write the file
-  write.csv(allindpars, "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/AllIndpars.csv", row.names=FALSE)
+  write.csv(mergedPars, "C:/Users/elianyperez/Desktop/Rmodeling/AllIndpars.csv", row.names=FALSE)
 
-  allindpars<-read.csv("G:/My Drive/EP_Year1/IGT analysis/Rmodeling/allindpars.csv")
-  Etotal<-read.csv( "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/Etotal.csv")
-  merged<-merge(allindpars,Etotal,by.x="ID")
 ```
 
 ```{r}
-    library(ggplot2)
-  library(ggpubr)
   theme_set(
     theme_minimal() +
-      theme(legend.position = "top")
+      theme(legend.position = "right")
   )
-  b <- ggplot(merged, aes(x = E_choice, y = cons))
+  a <- ggplot(mergedPars, aes(x = E_choice, y = pvl_A))
   # Scatter plot with regression line
-  b + geom_point()+
-    geom_smooth(method = "lm") 
+  a + geom_point()+
+      geom_smooth(method = "lm") 
 ```
 
 ```{r}
 
-  a <- ggplot(mergedPars, aes(x = E_choice, y = cons))
+  b <- ggplot(mergedPars, aes(x = E_choice, y = pvl_alpha))
   # Scatter plot with regression line
-  a + geom_point()+
-    geom_smooth(method = "lm") 
+  b + geom_point()+
+      geom_smooth(method = "lm") 
 
 ```
 
+```{r}
+
+  c <- ggplot(mergedPars, aes(x = E_choice, y = pvl_cons))
+  # Scatter plot with regression line
+  c + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+```{r}
+
+  d <- ggplot(mergedPars, aes(x = E_choice, y = pvl_lambda))
+  # Scatter plot with regression line
+  d + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+```{r}
+
+  e <- ggplot(mergedPars, aes(x = E_choice, y = orl_Arew))
+  # Scatter plot with regression line
+  e + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+
+```{r}
+
+  f <- ggplot(mergedPars, aes(x = E_choice, y = orl_Apun))
+  # Scatter plot with regression line
+  f + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+
+```{r}
+
+  g <- ggplot(mergedPars, aes(x = E_choice, y = orl_K))
+  # Scatter plot with regression line
+  g + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+
+```{r}
+
+  h <- ggplot(mergedPars, aes(x = E_choice, y = orl_betaF))
+  # Scatter plot with regression line
+  h + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+
+```{r}
+
+  i <- ggplot(mergedPars, aes(x = E_choice, y = orl_betaP))
+  # Scatter plot with regression line
+  i + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+
+```{r}
+  j <- ggplot(mergedPars, aes(x = E_choice, y = vpp_A))
+  # Scatter plot with regression line
+  j + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+
+```{r}
+
+  k <- ggplot(mergedPars, aes(x = E_choice, y = vpp_alpha))
+  # Scatter plot with regression line
+  k + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+```{r}
+
+  l <- ggplot(mergedPars, aes(x = E_choice, y = vpp_cons))
+  # Scatter plot with regression line
+  l + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+```{r}
+
+  m <- ggplot(mergedPars, aes(x = E_choice, y = vpp_lambda))
+  # Scatter plot with regression line
+  m + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+
+```{r}
+
+  n <- ggplot(mergedPars, aes(x = E_choice, y = vpp_epP))
+  # Scatter plot with regression line
+  n + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+```{r}
+
+  o <- ggplot(mergedPars, aes(x = E_choice, y = vpp_epN))
+  # Scatter plot with regression line
+  o + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+```{r}
+
+  p <- ggplot(mergedPars, aes(x = E_choice, y = vpp_K))
+  # Scatter plot with regression line
+  p + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+```{r}
+
+  q <- ggplot(mergedPars, aes(x = E_choice, y = vpp_w))
+  # Scatter plot with regression line
+  q + geom_point()+
+      geom_smooth(method = "lm") 
+
+```
+
+
+correlation matrix
+
+```{r}
+corr<-cor(mergedPars)
+ggcorrplot(corr)
+corr
+ggcorrplot(corr, hc.order = TRUE, type = "lower",
+           lab = FALSE)
+```
+
+```{r}
+corrpvl<-cor(pvlPars)
+ggcorrplot(corrpvl)
+ggcorrplot(corrpvl, hc.order = TRUE, type = "lower",
+           lab = TRUE)
+```
+
+```{r}
+corrorl<-cor(orlPars)
+ggcorrplot(corrorl)
+ggcorrplot(corrorl, hc.order = TRUE, type = "lower",
+           lab = TRUE)
+```
+
+```{r}
+corrvpp<-cor(vppPars)
+ggcorrplot(corrvpp)
+ggcorrplot(corrvpp, hc.order = TRUE, type = "lower",
+           lab = TRUE)
+```
