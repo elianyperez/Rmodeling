@@ -94,8 +94,30 @@ Correlations between mode parameters and raw E choice
 
 ```{r}
   setwd("G:/My Drive/EP_Year1/IGT analysis/Rmodeling")
-  allindpars<-as.data.frame(pvl3$allIndPars)
-  write.csv(allindpars, "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/allindpars.csv", row.names=FALSE)
+  pvlPars<-as.data.frame(pvl$allIndPars)
+  orlPars<-as.data.frame(orl$allIndPars)
+  vppPars<-as.data.frame(vpp$allIndPars)
+  Echoice<- read.csv("G:/My Drive/EP_Year1/IGT analysis/Rmodeling/Etotal.csv")
+  
+  names(pvlPars)<-c("ID","pvl_A","pvl_alpha","pvl_cons","pvl_lambda")
+  names(orlPars)<-c("ID","orl_Arew","orl_Apun","orl_K","orl_betaF","orl_betaP" )
+  names(vppPars)<-c("ID","vpp_A","vpp_alpha","vpp_cons","vpp_lambda","vpp_epP","vpp_epN","vpp_K","vpp_w")
+  
+  #merge- can only merge 2 at a time
+  merged<-merge(pvlPars,orlPars,by.x="ID")
+  merged2<-merge(vppPars,Echoice,by.x="ID")
+  mergedPars<-merge(merged,merged2,by.x="ID")
+
+names(mergedPars)
+  
+  #choose columns
+  mergedPars<- mergedPars[c("ID","pvl_A","pvl_alpha","pvl_cons","pvl_lambda","orl_Arew","orl_Apun","orl_K","orl_betaF","orl_betaP","vpp_A","vpp_alpha","vpp_cons","vpp_lambda","vpp_epP","vpp_epN","vpp_K","vpp_w","E_choice")] 
+  pvlPars<-mergedPars[c("ID","pvl_A","pvl_alpha","pvl_cons","pvl_lambda","E_choice")] 
+  orlPars<-mergedPars[c("ID","orl_Arew","orl_Apun","orl_K","orl_betaF","orl_betaP","E_choice")]
+  vppPars<-mergedPars[c("ID","vpp_A","vpp_alpha","vpp_cons","vpp_lambda","vpp_epP","vpp_epN","vpp_K","vpp_w","E_choice")] 
+  
+  #if you want to write the file
+  write.csv(allindpars, "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/AllIndpars.csv", row.names=FALSE)
 
   allindpars<-read.csv("G:/My Drive/EP_Year1/IGT analysis/Rmodeling/allindpars.csv")
   Etotal<-read.csv( "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/Etotal.csv")
@@ -116,7 +138,11 @@ Correlations between mode parameters and raw E choice
 ```
 
 ```{r}
-cor.test(merged$E_choice, merged$cons, method=c("pearson", "kendall", "spearman"))
+
+  a <- ggplot(mergedPars, aes(x = E_choice, y = cons))
+  # Scatter plot with regression line
+  a + geom_point()+
+    geom_smooth(method = "lm") 
 
 ```
 
