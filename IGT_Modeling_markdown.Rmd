@@ -2,6 +2,10 @@
 title: "IGT_Modeling"
 author: "Eliany Perez"
 date: "3/10/2021"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 pvl: html_document
 ---
 
@@ -24,81 +28,81 @@ library(ggcorrplot)
 
 Run PVL model
 
-```{r}
-pvl<-igt_pvl_delta(data = "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/igt_data2.txt", niter = 4000, nwarmup = 1000,
-              nchain = 4, ncore = 1, nthin = 1, inits = "vb",
-              indPars = "mean", modelRegressor = FALSE, vb = FALSE,
-              inc_postpred = FALSE, adapt_delta = 0.95, stepsize = 1,
-              max_treedepth = 10)
+```{r pvl model}
+#pvl<-igt_pvl_delta(data = "C:/Users/elianyperez/Desktop/Rmodeling/igt_data2.txt", niter = 4000, nwarmup = 1000,
+ #             nchain = 4, ncore = 1, nthin = 1, inits = "vb",
+  #            indPars = "mean", modelRegressor = FALSE, vb = FALSE,
+   #           inc_postpred = FALSE, adapt_delta = 0.95, stepsize = 1,
+    #          max_treedepth = 10)
 
 ```
 
 ```{r}
 # Visually check convergence of the sampling chains (should look like 'hairy caterpillars')
-plot(pvl, type = "trace")
+#plot(pvl, type = "trace")
 
 # Check Rhat values (all Rhat values should be less than or equal to 1.1)
-rhat(pvl)
+#rhat(pvl)
 
 # Plot the posterior distributions of the hyper-parameters (distributions should be unimodal)
-plot(pvl)
+#plot(pvl)
 
 # Show the WAIC and LOOIC model fit estimates
-printFit(pvl)
+#printFit(pvl)
 ```
 
 Run orl model
 
-```{r}
-orl<-igt_orl(data = "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/igt_data2.txt", niter = 4000, nwarmup = 1000, nchain = 4,
-  ncore = 1, nthin = 1, inits = "vb", indPars = "mean",
-  modelRegressor = FALSE, vb = FALSE, inc_postpred = FALSE,
-  adapt_delta = 0.95, stepsize = 1, max_treedepth = 10)
+```{r orl model}
+#orl<-igt_orl(data = "C:/Users/elianyperez/Desktop/Rmodeling/igt_data2.txt", niter = 4000, nwarmup = 1000, nchain = 4,
+ # ncore = 1, nthin = 1, inits = "vb", indPars = "mean",
+  #modelRegressor = FALSE, vb = FALSE, inc_postpred = FALSE,
+  #adapt_delta = 0.95, stepsize = 1, max_treedepth = 10)
 ```
 
 ```{r}
 # Visually check convergence of the sampling chains (should look like 'hairy caterpillars')
-plot(orl, type = "trace")
+#plot(orl, type = "trace")
 
 # Check Rhat values (all Rhat values should be less than or equal to 1.1)
-rhat(orl)
+#rhat(orl)
 
 # Plot the posterior distributions of the hyper-parameters (distributions should be unimodal)
-plot(orl)
+#plot(orl)
 
 # Show the WAIC and LOOIC model fit estimates
-printFit(orl)
+#printFit(orl)
 ```
 
 Run vpp model
 
-```{r}
-vpp<-igt_vpp(data = "G:/My Drive/EP_Year1/IGT analysis/Rmodeling/igt_data2.txt", niter = 4000, nwarmup = 1000, nchain = 4,
-  ncore = 4, nthin = 1, inits = "vb", indPars = "mean",
-  modelRegressor = FALSE, vb = FALSE, inc_postpred = FALSE,
-  adapt_delta = 0.95, stepsize = 1, max_treedepth = 10)
+```{r vpp model}
+#vpp<-igt_vpp(data = "C:/Users/elianyperez/Desktop/Rmodeling/igt_data2.txt", niter = 4000, nwarmup = 1000, nchain = 4,
+ # ncore = 4, nthin = 1, inits = "vb", indPars = "mean",
+  #modelRegressor = FALSE, vb = FALSE, inc_postpred = FALSE,
+  #adapt_delta = 0.95, stepsize = 1, max_treedepth = 10)
 ```
 
 ```{r}
 # Visually check convergence of the sampling chains (should look like 'hairy caterpillars')
-plot(vpp, type = "trace")
+#plot(vpp, type = "trace")
 
 # Check Rhat values (all Rhat values should be less than or equal to 1.1)
-rhat(vpp)
+#rhat(vpp)
 
 # Plot the posterior distributions of the hyper-parameters (distributions should be unimodal)
-plot(vpp)
+#plot(vpp)
 
 # Show the WAIC and LOOIC model fit estimates
-printFit(vpp)
+#printFit(vpp)
 
-save.image(vpp.RData)
+#save.image(vpp.RData)
 ```
 
 Correlations between mode parameters and raw E choice
 
 ```{r}
-  load(vpp.RData)
+  #load(vpp.RData)
   setwd("C:/Users/elianyperez/Desktop/Rmodeling")
   pvlPars<-as.data.frame(pvl$allIndPars)
   orlPars<-as.data.frame(orl$allIndPars)
@@ -137,6 +141,7 @@ names(mergedPars)
   # Scatter plot with regression line
   a + geom_point()+
       geom_smooth(method = "lm") 
+  cor.test(mergedPars$E_choice, mergedPars$pvl_A,method = c("pearson", "kendall", "spearman"))
 ```
 
 ```{r}
@@ -145,7 +150,7 @@ names(mergedPars)
   # Scatter plot with regression line
   b + geom_point()+
       geom_smooth(method = "lm") 
-
+cor.test(mergedPars$E_choice, mergedPars$pvl_alpha,method = c("pearson", "kendall", "spearman"))
 ```
 
 ```{r}
@@ -153,8 +158,8 @@ names(mergedPars)
   c <- ggplot(mergedPars, aes(x = E_choice, y = pvl_cons))
   # Scatter plot with regression line
   c + geom_point()+
-      geom_smooth(method = "lm") 
-
+      geom_smooth(method = "lm")
+cor.test(mergedPars$E_choice, mergedPars$pvl_cons,method = c("pearson", "kendall", "spearman"))
 ```
 
 ```{r}
